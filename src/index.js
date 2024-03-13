@@ -2,11 +2,12 @@ import express, { req, res } from "express";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import validateUser from "./middlewares/validateUser";
-
+const { v4: uuidv4 } = require("uuid");
+const idAutomatic = uuidv4();
 const app = express();
 const port = 3333;
 const admins = [];
-let nextId = 1;
+
 const messages = [];
 
 app.use(express.json());
@@ -35,16 +36,15 @@ app.post("/signup/crypto", validateUser, async (req, res) => {
   if (emailAlreadyExist) {
     return res.status(400).json({ message: "Usuário já cadastrado." });
   }
+
   const hashPassword = await bcrypt.hash(password, 10);
 
   admins.push({
-    id: nextId,
+    id: idAutomatic,
     name: data.name,
     email: data.email,
     password: hashPassword,
   });
-
-  nextId++;
 
   res.status(201).json({ message: "Usuário cadastrado com sucesso." });
 });
@@ -107,12 +107,11 @@ app.post("/messages/:userEmail", (req, res) => {
   }
 
   messages.push({
-    id: nextId,
+    id: idAutomatic,
     usuario: userEmail,
     titulo: data.titulo,
     descricao: data.descricao,
   });
-  nextId++;
 
   res.status(200).json({ message: "Recado enviado com sucesso!" });
 });
